@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <input id="msg" placeholder="Ваше сообщение" />
+  <button onclick="sendToTelegram()">Отправить</button>
+
+  <script>
+    const BOT_TOKEN = "7123456789:AAFxxx...";  // твой токен
+    const CHAT_ID  = "123456789";               // твой chat_id
+
+    async function sendToTelegram() {
+      const text = document.getElementById("msg").value;
+      if (!text) return;
+
+      const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: CHAT_ID, text })
+      });
+      const data = await res.json();
+      alert(data.ok ? "Отправлено!" : "Ошибка: " + data.description);
+    }
+  </script>
+</body>
+</html>
