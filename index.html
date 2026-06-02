@@ -1,26 +1,44 @@
+<!-- index.html -->
 <!DOCTYPE html>
-<html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Контакты</title>
+</head>
 <body>
-  <input id="msg" placeholder="Ваше сообщение" />
-  <button onclick="sendToTelegram()">Отправить</button>
+  <form id="form">
+    <input id="name"    placeholder="Имя"     required />
+    <input id="email"   placeholder="Email"   type="email" required />
+    <textarea id="msg"  placeholder="Сообщение" required></textarea>
+    <button type="submit">Отправить</button>
+    <p id="status"></p>
+  </form>
 
   <script>
-    const BOT_TOKEN = "7835084165:AAFG6G1DlsQoXUuezDNL6g64KyvLY6OKm_A";  // твой токен
-    const CHAT_ID  = "991728346";               // твой chat_id
+    // URL твоего Worker'а (вида https://my-worker.username.workers.dev)
+    const WORKER_URL = 'https://YOUR_WORKER.workers.dev';
 
-    async function sendToTelegram() {
-      const text = document.getElementById("msg").value;
-      if (!text) return;
+    document.getElementById('form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = document.getElementById('status');
+      status.textContent = 'Отправляю...';
 
-      const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id: CHAT_ID, text })
-      });
-      const data = await res.json();
-      alert(data.ok ? "Отправлено!" : "Ошибка: " + data.description);
-    }
+      try {
+        const res = await fetch(WORKER_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name:    document.getElementById('name').value,
+            email:   document.getElementById('email').value,
+            message: document.getElementById('msg').value,
+          })
+        });
+        const data = await res.json();
+        status.textContent = data.ok ? '✅ Отправлено!' : '❌ Ошибка';
+      } catch {
+        status.textContent = '❌ Ошибка сети';
+      }
+    });
   </script>
 </body>
 </html>
